@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { apiFetch } from '../config/api';
 
 const AdminUsers = () => {
   const { user } = useContext(AuthContext);
@@ -7,7 +8,7 @@ const AdminUsers = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const res = await fetch('/api/users/users', {
+      const res = await apiFetch('/api/users/users', {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       const data = await res.json();

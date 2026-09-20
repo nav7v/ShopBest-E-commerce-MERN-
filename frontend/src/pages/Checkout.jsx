@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { clearCart } from '../redux/cartSlice';
 import { AuthContext } from '../context/AuthContext';
+import { apiFetch } from '../config/api';
 
 
 const Checkout = () => {
@@ -19,7 +20,7 @@ const Checkout = () => {
 
   const handlePayment = async () => {
     try {
-      const orderRes = await fetch('/api/payments/orders', {
+      const orderRes = await apiFetch('/api/payments/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: totalPrice })
@@ -44,7 +45,7 @@ const Checkout = () => {
         description: 'Test Transaction',
         order_id: orderData.id,
         handler: async function (response) {
-          const verifyRes = await fetch('/api/payments/verify', {
+          const verifyRes = await apiFetch('/api/payments/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(response)
@@ -67,7 +68,7 @@ const Checkout = () => {
               paymentId: response.razorpay_payment_id
             };
 
-            const saveOrderRes = await fetch('/api/orders', {
+            const saveOrderRes = await apiFetch('/api/orders', {
               method: 'POST',
               headers: { 
                 'Content-Type': 'application/json',
@@ -122,7 +123,7 @@ const Checkout = () => {
       paymentId: 'bypass_txn_' + Date.now()
     };
 
-    const saveOrderRes = await fetch('/api/orders', {
+    const saveOrderRes = await apiFetch('/api/orders', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
