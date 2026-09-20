@@ -6,6 +6,13 @@ dotenv.config();
 
 const createdOrder = async (req, res) => {
   try {
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      return res.status(400).json({
+        message:
+          "Payment gateway not configured. Add Razorpay credentials in Render.",
+      });
+    }
+
     const instance = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID,
       key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -24,6 +31,13 @@ const createdOrder = async (req, res) => {
 
 const verifyPayment = async (req, res) => {
   try {
+    if (!process.env.RAZORPAY_KEY_SECRET) {
+      return res.status(400).json({
+        message:
+          "Payment gateway not configured. Add Razorpay credentials in Render.",
+      });
+    }
+
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
       req.body;
     const generated_signature = crypto

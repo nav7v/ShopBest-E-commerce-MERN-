@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
@@ -9,6 +11,9 @@ import adminRoutes from "./routes/analyticsRoutes.js";
 import dotenv from "dotenv";
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 //intialize express app
 const app = express();
 
@@ -16,11 +21,16 @@ const app = express();
 app.use(cors());
 
 // Set CORS for frontend URL / allow single-node deploy
-app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', process.env.FRONTEND_URL],
-  credentials: true
-}));
-
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+      process.env.FRONTEND_URL,
+    ],
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 
@@ -39,15 +49,20 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/analytics", adminRoutes);
 
 // Serve frontend in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/build')));
-  
-  app.use((req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend/build/index.html'));
+if (process.env.NODE_ENV === "production") {
+  const frontendBuildPath = path.join(__dirname, "../frontend/build");
+
+  app.use(express.static(frontendBuildPath));
+
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api")) {
+      return next();
+    }
+    res.sendFile(path.resolve(frontendBuildPath, "index.html"));
   });
 } else {
-  app.get('/', (req, res) => {
-    res.send('ShopNest API is running in Development mode...');
+  app.get("/", (req, res) => {
+    res.send("ShopBest API is running in Development mode...");
   });
 }
 
